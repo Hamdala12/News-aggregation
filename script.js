@@ -3,19 +3,44 @@ const newsUrl = `https://newsapi.org/v2/top-headlines?apiKey=${apiKey}&category=
 
 let bookmarks = [];
 
-function fetchNews(category) {
-    fetch(`${newsUrl}${category}`)
-        .then(response => response.json())
-        .then(data => displayNews(data.articles))
-        .catch(error => alert('Error fetching news: ' + error));
+async function fetchNews(category) {
+    try {
+        const response = await fetch(`${newsUrl}${category}`);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        console.log('Fetched news data:', data); 
+        
+        
+        if (data && Array.isArray(data.articles)) {
+            displayNews(data.articles);
+        } else {
+            console.error('No articles found or data is not an array');
+        }
+    } catch (error) {
+        alert('Error fetching news: ' + error);
+    }
 }
 
-function searchNews() {
+async function searchNews() {
     const query = document.getElementById('searchInput').value;
-    fetch(`https://newsapi.org/v2/everything?q=${query}&apiKey=${apiKey}`)
-        .then(response => response.json())
-        .then(data => displayNews(data.articles))
-        .catch(error => alert('Error searching for news: ' + error));
+    try {
+        const response = await fetch(`https://newsapi.org/v2/everything?q=${query}&apiKey=${apiKey}`);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        console.log('Fetched search data:', data); 
+        
+        if (data && Array.isArray(data.articles)) {
+            displayNews(data.articles);
+        } else {
+            console.error('No articles found or data is not an array');
+        }
+    } catch (error) {
+        alert('Error searching for news: ' + error);
+    }
 }
 
 function displayNews(articles) {
@@ -66,4 +91,8 @@ function removeBookmark(url) {
     bookmarks = bookmarks.filter(article => article.url !== url);
     displayBookmarkedArticles();
 }
+
+
+
+
 
